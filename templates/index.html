@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Placement Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --bg-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --success-bg: #e6fffa;
+            --success-text: #065f46;
+            --danger-bg: #fff5f5;
+            --danger-text: #7f1d1d;
+            --warning-bg: #fff3cd;
+            --warning-text: #856404;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 520px;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 28px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 15px;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .actions {
+            margin-top: 28px;
+            display: flex;
+            gap: 12px;
+        }
+
+        button {
+            flex: 1;
+            padding: 13px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+        }
+
+        .predict-btn {
+            background: var(--primary);
+            color: white;
+        }
+
+        .predict-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .reset-btn {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .reset-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .result {
+            margin-top: 26px;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .placed {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .not-placed {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+        }
+
+        .error {
+            background: var(--warning-bg);
+            color: var(--warning-text);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Student Placement Prediction</h2>
+    <div class="subtitle">
+        Enter academic and skill details to estimate placement chances
+    </div>
+
+    <form action="/predict" method="post">
+
+        <div class="field">
+            <label>IQ</label>
+            <input type="number" name="IQ" min="50" max="200" required>
+            <div class="hint">Typical range: 70 – 150</div>
+        </div>
+
+        <div class="field">
+            <label>CGPA</label>
+            <input type="number" name="CGPA" step="0.01" min="0" max="10" required>
+            <div class="hint">Scale: 0 – 10</div>
+        </div>
+
+        <div class="field">
+            <label>10th Marks (%)</label>
+            <input type="number" name="10th_Marks" min="0" max="100" required>
+        </div>
+
+        <div class="field">
+            <label>12th Marks (%)</label>
+            <input type="number" name="12th_Marks" min="0" max="100" required>
+        </div>
+
+        <div class="field">
+            <label>Communication Skills (0 – 10)</label>
+            <input type="number" name="Communication_Skills" step="0.1" min="0" max="10" required>
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="predict-btn">Predict</button>
+            <button type="reset" class="reset-btn">Reset</button>
+        </div>
+    </form>
+
+    {% if prediction_text %}
+        {% if "Placed" in prediction_text %}
+            <div class="result placed">{{ prediction_text }}</div>
+        {% elif "Not Placed" in prediction_text %}
+            <div class="result not-placed">{{ prediction_text }}</div>
+        {% else %}
+            <div class="result error">{{ prediction_text }}</div>
+        {% endif %}
+    {% endif %}
+
+    <footer>
+        Powered by Machine Learning • Flask App
+    </footer>
+</div>
+
+</body>
+</html>
